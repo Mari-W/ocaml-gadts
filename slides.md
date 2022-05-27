@@ -3,7 +3,7 @@ marp: true
 title: Generalized Algebraic Data Types in OCaml
 author: Marius Weidner
 theme: uncover
-class: invert
+
 paginate: true
 math: katex
 style: |
@@ -37,7 +37,8 @@ style: |
         letter-spacing: 0.00000001rem;
     }
     footer {
-      color: white;
+
+      color: black;
     }
     
 ---
@@ -45,10 +46,26 @@ style: |
 <!-- _paginate: false -->
 <!-- _footer: Marius Weidner ‒ Lehrstuhl für Programmiersprachen ‒ Proseminar '22 -->
 
+<!-- 
+- Wichtiges vorangegangenes Kapitel: Variants
+- ADTs <-> Variants
+- Der Plan
+  - Eigene Sprache `L-If`
+  - Nachteile bei Interpreterimplementierung ohne GADTs
+  - Vorteile mit 
+  - 2 weitere coole Konzepte mit GADTs
+- Introduction by Example & Intuition
+- Fragen gerne zwischen rein stellen
+-->
+
 # Generalized Algebraic Data Types
 ### in OCaml
 
 ---
+
+<!--
+- CNF grammar
+-->
 
 #### Die Sprache `L-If`
 
@@ -69,9 +86,9 @@ $$
     font-size: 0.8rem;
   }
   div.error > pre {
-    font-size: 0.78rem;
+    font-size: 0.77rem;
     border: 0.05rem;
-    background-color: #2b2d33; 
+    background-color: rgb(242, 241, 244); 
     border-color: #B00020;
     border-style: solid;
     border-radius: 12px;
@@ -80,6 +97,16 @@ $$
 
 <div class="columns">
 <div>
+
+<!--
+- atom ist program
+- if ist program
+- program nested
+
+- ! int als condition
+- ! verschiedene typen in zweigen
+- ! nested verschiedene typen in zweigen
+-->
 
 Gültige Programme
 
@@ -147,7 +174,7 @@ _<p class="subtitle">Syntaxbaum für `L-ADT-If`</p>_
 ---
 
 ```ocaml
-let rec eval: expr -> atom = function
+let rec eval : expr -> atom = function
   | Atom a -> a
   | If (c, i, e) -> begin match eval c with
       | Bool true  -> eval i
@@ -196,7 +223,7 @@ Exception: Failure "need bool!"
 _<p class="subtitle">Beispiele in `L-ADT-If`</p>_
 
 - Ungültige Programmdefinition möglich
-- Laufzeitfehler im Interpreter
+- Laufzeitfehler im Interpreter   
 - Zweige können verschiedene Typen haben
 
 ---
@@ -281,7 +308,7 @@ _<p class="subtitle">Evaluationsfunktion für `L-GADT-If`</p>_
   div.error > pre {
     font-size: 0.77rem;
     border: 0.1rem;
-    background-color: #2b2d33; 
+    background-color: rgb(242, 241, 244); 
     border-color: #B00020;
     border-style: solid;
     border-radius: 12px;
@@ -322,7 +349,10 @@ _<p class="subtitle">Beispiele in `L-GADT-If`</p>_
 
 ---
 
-#### Local Abstrakte Typen
+#### Lokal Abstrakte Typen
+
+#
+#
 
 <style scoped>  
 pre { 
@@ -398,7 +428,7 @@ let first : type a r. a list -> (a, r) mode -> r =
       | Unsafe -> failwith "list is empty"
       | Option -> None)
 ```
-_<p class="subtitle">Funktion `first` mit unterschiedlichen Rückgabewerten je nach `mode`</p>_
+_<p class="subtitle">Funktion mit unterschiedlichen Rückgabewerten</p>_
 
 ---
 
@@ -415,7 +445,7 @@ type stringable =
 let print (Stringable s) = 
   print_endline (s.to_string s.item)       
 ```
-_<p class="subtitle">Existenzieller Typ `stringable` mit `print` Funktion</p>_
+_<p class="subtitle">Existenzieller Typ</p>_
 
 ---
 #### In einer Nussschale
