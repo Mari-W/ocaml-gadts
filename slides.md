@@ -5,6 +5,7 @@ author: Marius Weidner
 theme: uncover
 class: invert
 paginate: true
+math: katex
 style: |
     :root {
         font-family: 'JetBrains Mono', serif !important;
@@ -64,19 +65,21 @@ $$
 ---
 
 <style scoped> 
-pre {  
-  font-size: 0.8rem;
-}
-div.error > pre {
-  font-size: 0.75rem;
-  border: 0.1rem;
-  border-color: #B00020;
-  border-style: solid;
-  border-radius: 12px;
-}
+  pre {  
+    font-size: 0.8rem;
+  }
+  div.error > pre {
+    font-size: 0.75rem;
+    border: 0.1rem;
+    border-color: #B00020;
+    border-style: solid;
+    border-radius: 12px;
+  }
 </style>
+
 <div class="columns">
 <div>
+
 Gültige Programme
 
 #
@@ -95,6 +98,7 @@ else
   0
 ```
 </div>
+
 <div class="error">
 
 Ungültige Programme
@@ -119,8 +123,6 @@ else
 </div>
 
 ---
-
-#
 
 #### In einer Welt ohne GADTs: `L-ADT-If`
 
@@ -288,7 +290,7 @@ let rec eval (type a) (e : a expr) : a = match e with
   | If (c, i, e)  -> if eval c then eval i else eval e
 ```
 
-_<p class="subtitle">Evaluationsfunktion mit Lokal Abstrakten Typen für_ **L-GADT-If**</p>
+_<p class="subtitle">Evaluationsfunktion mit Lokal Abstrakten Typen für `L-GADT-If`</p>_
 
 ---
 
