@@ -99,8 +99,6 @@ else
 
 Ungültige Programme
 
-
-
 #
 #
 
@@ -382,6 +380,9 @@ _<p class="subtitle">Existenzieller Typ `stringable` mit `print` Funktion</p>_
 - Allerdings wird mit GADTs die Typinferenz unentscheidbar, weshalb Typannotationen benötigt werden, zudem benötigt es neue Konzepte um rekursive Funktionen zu realisieren
 
 ---
+#### Material
+
+- [https://mari-w.github.io/ocaml-gadts/](https://mari-w.github.io/ocaml-gadts/)
 
 #### Literatur
 - [Real World OCaml: GADTs](https://dev.realworldocaml.org/gadts.html) <br> Yaron Minsky, Anil Madhavapeddy `2021`
