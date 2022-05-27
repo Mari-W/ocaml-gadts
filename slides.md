@@ -184,7 +184,7 @@ eval (If
 eval (If 
      (Atom (Int 42),
      (Atom (Bool false)),
-     (Atom (Int 0))))
+     (Atom (Int 0))))           
 ```
 ```ocaml
 Exception: Failure "need bool!"
