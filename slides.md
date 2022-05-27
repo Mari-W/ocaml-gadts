@@ -272,6 +272,56 @@ _<p class="subtitle">Evaluationsfunktion f체r `L-GADT-If`</p>_
 
 ---
 
+#### Die Vorteile von `L-GADT-If`
+
+<style scoped> 
+  pre {  
+    font-size: 0.8rem;
+  }
+  div.error > pre {
+    font-size: 0.77rem;
+    border: 0.1rem;
+    background-color: #2b2d33; 
+    border-color: #B00020;
+    border-style: solid;
+    border-radius: 12px;
+  }
+</style>
+<div class="columns">
+<div>
+
+```ocaml
+eval (If 
+     (Atom (Bool true),
+     (Atom (Int 42)),
+     (Atom (Int 0))))
+```
+
+```ocaml
+- : int = 42
+```
+
+</div>
+<div class="error">
+
+```ocaml
+eval (If 
+     (Atom (Int 42),
+     (Atom (Bool false)),
+     (Atom (Int 0))))
+```
+
+</div>
+</div>
+
+_<p class="subtitle">Beispiele in `L-GADT-If`</p>_
+
+- Keine ung체ltigen Programmdefinitionen
+- Keine Laufzeitfehler im Interpreter
+- Exhaustive Patternmatching
+
+---
+
 #### Local Abstrakte Typen
 
 <style scoped>  
@@ -308,7 +358,13 @@ let rec eval : 'a. 'a expr -> 'a =
       | If (c, i, e)  -> if eval c then eval i else eval e
 ```
 
-<->
+_<p class="subtitle">Evaluationsfunktion mit L.A.T. und polymorpher Rekursion f체r `L-GADT-If`</p>_
+
+---
+
+<style scoped>  pre { font-size: 0.85rem; }
+</style>
+
 
 ```ocaml
 let rec eval : type a. a expr -> a = function
@@ -317,17 +373,7 @@ let rec eval : type a. a expr -> a = function
   | If (c, i, e)  -> if eval c then eval i else eval e   
 ```
 
-_<p class="subtitle">Evaluationsfunktion mit L.A.T. und polymorpher Rekursion f체r `L-GADT-If`</p>_
-
-
----
-
-#### Die Vorteile von `L-GADT-If`
-
-
-- Keine ungl체tigen Programmdefinitionen
-- Keine Laufzeitfehler im Interpreter
-- Exhaustive Patternmatching
+_<p class="subtitle">Evaluationsfunktion f체r `L-GADT-If`</p>_
 
 ---
 
@@ -339,7 +385,7 @@ _<p class="subtitle">Evaluationsfunktion mit L.A.T. und polymorpher Rekursion f�
 ```ocaml
 type (_, _) mode = 
   | Unsafe : ('a, 'a) mode
-  | Option : ('a, 'a option) mode
+  | Option : ('a, 'a option) mode                  
 ```
 
 ```ocaml
