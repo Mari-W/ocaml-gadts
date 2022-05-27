@@ -3,10 +3,10 @@ type (_, _) mode =
   | Option : ('a, 'a option) mode
 
 let first : type a r. a list -> (a, r) mode -> r = 
-  fun lst mode -> match lst with
-    | hd :: tl -> (match mode with
+  fun lst mde -> match lst with
+    | hd :: tl -> (match mde with
       | Unsafe -> hd
       | Option -> Some hd)
-    | [ ] -> (match mode with
+    | [ ] -> (match mde with
       | Unsafe -> failwith "list is empty"
       | Option -> None)

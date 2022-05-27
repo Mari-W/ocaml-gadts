@@ -420,11 +420,11 @@ type (_, _) mode =
 
 ```ocaml
 let first : type a r. a list -> (a, r) mode -> r = 
-  fun lst mode -> match lst with
-    | hd :: tl -> (match mode with
+  fun lst mde -> match lst with
+    | hd :: tl -> (match mde with
       | Unsafe -> hd
       | Option -> Some hd)
-    | [ ] -> (match mode with
+    | [ ] -> (match mde with
       | Unsafe -> failwith "list is empty"
       | Option -> None)
 ```
@@ -461,7 +461,7 @@ _<p class="subtitle">Existenzieller Typ</p>_
 ---
 #### Folien
 
-[https://mari-w.github.io/ocaml-gadts/](https://mari-w.github.io/ocaml-gadts/)
+[https://mari-w.github.io/ocaml-gadts](https://mari-w.github.io/ocaml-gadts/)
 
 #### Literatur
 - [Real World OCaml: GADTs](https://dev.realworldocaml.org/gadts.html) <br> Yaron Minsky, Anil Madhavapeddy `2021`
