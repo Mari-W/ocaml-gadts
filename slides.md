@@ -71,6 +71,7 @@ $$
   div.error > pre {
     font-size: 0.75rem;
     border: 0.1rem;
+    background-color: #2b2d33; 
     border-color: #B00020;
     border-style: solid;
     border-radius: 12px;
@@ -382,9 +383,9 @@ _<p class="subtitle">Existenzieller Typ `stringable` mit `print` Funktion</p>_
 - Allerdings wird mit GADTs die Typinferenz unentscheidbar, weshalb Typannotationen benötigt werden, zudem benötigt es neue Konzepte um rekursive Funktionen zu realisieren
 
 ---
-#### Material
+#### Folien
 
-- [https://mari-w.github.io/ocaml-gadts/](https://mari-w.github.io/ocaml-gadts/)
+[https://mari-w.github.io/ocaml-gadts/](https://mari-w.github.io/ocaml-gadts/)
 
 #### Literatur
 - [Real World OCaml: GADTs](https://dev.realworldocaml.org/gadts.html) <br> Yaron Minsky, Anil Madhavapeddy `2021`
