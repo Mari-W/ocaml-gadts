@@ -69,7 +69,7 @@ $$
     font-size: 0.8rem;
   }
   div.error > pre {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     border: 0.1rem;
     background-color: #2b2d33; 
     border-color: #B00020;
