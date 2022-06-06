@@ -100,9 +100,9 @@ $$
 - if ist program
 - program nested
 
+- ! invalid syntax
 - ! int als condition
 - ! verschiedene typen in zweigen
-- ! nested verschiedene typen in zweigen
 -->
 
 Gültige Programme
@@ -159,7 +159,7 @@ else
 ```ocaml
 type atom =
   | Bool of bool
-  | Int  of int
+  | Nat  of int
 
 type expr =
   | Atom of atom
@@ -173,8 +173,8 @@ _<p class="subtitle">Syntaxbaum ohne GADTs</p>_
 ```ocaml
 let rec eval : expr -> atom = function
   | Atom a -> a
-  | If (c, i, e) -> begin match eval c with
-      | Bool true  -> eval i
+  | If (c, t, e) -> begin match eval c with
+      | Bool true  -> eval t
       | Bool false -> eval e
       | _ -> failwith "need bool!"
     end
@@ -192,21 +192,21 @@ _<p class="subtitle">Evaluationsfunktion ohne GADTs</p>_
 ```ocaml
 eval (If 
      (Atom (Bool true),
-     (Atom (Int 42)),
-     (Atom (Int 0))))
+     (Atom (Nat 42)),
+     (Atom (Nat 0))))
 ```
 
 ```ocaml
-- : atom = Atom (Int 42)
+- : atom = Atom (Nat 42)
 ```
 
 </div><div>
 
 ```ocaml
 eval (If 
-     (Atom (Int 42),
+     (Atom (Nat 42),
      (Atom (Bool false)),
-     (Atom (Int 0))))           
+     (Atom (Nat 0))))           
 ```
 ```ocaml
 Exception: Failure "need bool!"
@@ -233,7 +233,7 @@ _<p class="subtitle">Beispiele ohne GADTs</p>_
 ```ocaml
 type _ atom =
   | Bool : bool -> bool atom
-  | Int  : int  -> int  atom
+  | Nat  : int  -> int  atom
 
 type _ expr =
   | Atom : 'a atom -> 'a expr
@@ -258,7 +258,7 @@ _<p class="subtitle">Syntaxbaum mit GADTs</p>_
 ```ocaml
 type atom =
   | Bool : bool -> atom
-  | Int  : int  -> atom
+  | Nat  : int  -> atom
 ```
 _<p class="subtitle">`atom` ohne GADTs</p>_
 </div>
@@ -267,7 +267,7 @@ _<p class="subtitle">`atom` ohne GADTs</p>_
 ```ocaml
 type _ atom =
   | Bool : bool -> bool atom
-  | Int  : int  -> int  atom
+  | Nat  : int  -> int  atom
 ```
 _<p class="subtitle">`atom` mit GADTs</p>_
 </div>
@@ -286,8 +286,8 @@ Konstrukturen können _verschiedene_ Typen annehmen.
 ```ocaml
 let rec eval : .. = function
   | Atom (Bool b) -> b
-  | Atom (Int i)  -> i
-  | If (c, i, e)  -> if eval c then eval i else eval e
+  | Atom (Nat i)  -> i
+  | If (c, t, e)  -> if eval c then eval t else eval e
 ```
 
 _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
@@ -314,7 +314,7 @@ _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 ```ocaml
 eval (If 
      (Atom (Bool true),
-     (Atom (Int 42)),
+     (Atom (Nat 42)),
      (Atom (Bool false))))
 ```
 
@@ -324,7 +324,7 @@ eval (If
 
 ```ocaml
 eval (If 
-     (Atom (Int 42),
+     (Atom (Nat 42),
      (Atom (Bool true)),
      (Atom (Bool false))))
 ```
@@ -350,10 +350,8 @@ _<p class="subtitle">Beispiele mit GADTs</p>_
 
 ---
 
-#### Lokal Abstrakte Typen
+#### Locally Abstract Types
 
-#
-#
 
 <style scoped>  
 pre { 
@@ -368,15 +366,22 @@ pre {
 ```ocaml
 let rec eval (type a) (e : a expr) : a = match e with
   | Atom (Bool b) -> b
-  | Atom (Int i)  -> i
-  | If (c, i, e)  -> if eval c then eval i else eval e
+  | Atom (Nat i)  -> i
+  | If (c, t, e)  -> if eval c then eval t else eval e
+```
+
+```
+Error: This expression has type a expr but an
+       expression was expected of type
+         bool expr
+       The type constructor a would escape its scope  
 ```
 
 _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 
 ---
 
-#### Polymorphe Rekursion
+#### Polymorphic Recursion
 
 #
 #
@@ -388,8 +393,8 @@ _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 let rec eval : 'a. 'a expr -> 'a = 
     fun (type a) (e : a expr) : a -> match e with
       | Atom (Bool b) -> b
-      | Atom (Int i)  -> i
-      | If (c, i, e)  -> if eval c then eval i else eval e
+      | Atom (Nat i)  -> i
+      | If (c, t, e)  -> if eval c then eval t else eval e
 ```
 
 _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
@@ -401,15 +406,15 @@ _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 # 
 #
 
-<style scoped>  pre { font-size: 0.85rem; }
+<style scoped>  pre { font-size: 0.8rem; }
 </style>
 
 
 ```ocaml
 let rec eval : type a. a expr -> a = function
   | Atom (Bool b) -> b
-  | Atom (Int i)  -> i
-  | If (c, i, e)  -> if eval c then eval i else eval e   
+  | Atom (Nat i)  -> i
+  | If (c, t, e)  -> if eval c then eval t else eval e   
 ```
 
 _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
@@ -440,7 +445,7 @@ let first : type a r. a list -> (a, r) mode -> r =
 
 ---
 
-#### Existenzielle Typen
+#### Existential Types
 
 ```ocaml
 type stringable =                          
@@ -460,13 +465,13 @@ let print (Stringable s) =
 #
 
 - Typinferenz unentscheidbar
-  $\rightarrow$ Typannotationen notwendig
+   $\rightarrow$ Typannotationen notwendig
 
 - `|`-Patterns nicht auflösbar
-  $\rightarrow$ Auflösen und Logik auslagern
+   $\rightarrow$ Auflösen und Logik auslagern
 
 - `[@@-deriving ..]` nicht ausdrückbar
-  $\rightarrow$ Non-GADT Version benötigt
+   $\rightarrow$ Non-GADT Version benötigt
 
 ---
 #### In einer Nussschale
