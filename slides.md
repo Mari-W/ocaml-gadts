@@ -33,11 +33,10 @@ style: |
         gap: 0.75rem;
     }
     .subtitle {
-        font-size: 0.55rem;
+        font-size: 0.7rem;
         letter-spacing: 0.00000001rem;
     }
     footer {
-
       color: black;
     }
     
@@ -48,14 +47,12 @@ style: |
 
 <!-- 
 - Wichtiges vorangegangenes Kapitel: Variants
-- ADTs <-> Variants
 - Der Plan
   - Eigene Sprache `L-If`
   - Nachteile bei Interpreterimplementierung ohne GADTs
   - Vorteile mit 
-  - 2 weitere coole Konzepte mit GADTs
-- Introduction by Example & Intuition
-- Fragen gerne zwischen rein stellen
+  - 2 weitere Konzepte mit GADTs
+- Übergang: Beginn mit der eignen Sprache
 -->
 
 # Generalized Algebraic Data Types
@@ -64,17 +61,17 @@ style: |
 ---
 
 <!--
-- CNF grammar
+- CFG
 -->
 
-#### Die Sprache `L-If`
+#### Sprachdefinition
 
 #
 #
 
 $$
 \begin{align*}
-Atom &::= true \text{ } | \text{ } false \text{ } | \text{ } 0..9^+ \\
+Atom &::= \text{true} \text{ } | \text{ } \text{false}  \text{ } | \text{ } 0..9^+ \\
 Expr &::= Atom \text{ } | \textbf{ if } Expr \textbf{ then } Expr \textbf{ else } Expr
 \end{align*}
 $$
@@ -135,10 +132,10 @@ Ungültige Programme
 #
 
 ```ocaml
-if 0 then true else false
+if true then 0
 ```
 ```ocaml
-if true then 0 else false
+if 0 then true else false
 ```
 ```ocaml
 if true then 
@@ -152,7 +149,7 @@ else
 
 ---
 
-#### In einer Welt ohne GADTs: `L-ADT-If`
+#### In einer Welt ohne GADTs
 
 # 
 
@@ -169,7 +166,7 @@ type expr =
   | If   of expr * expr * expr
 ```
 
-_<p class="subtitle">Syntaxbaum für `L-ADT-If`</p>_
+_<p class="subtitle">Syntaxbaum ohne GADTs</p>_
 
 ---
 
@@ -179,15 +176,13 @@ let rec eval : expr -> atom = function
   | If (c, i, e) -> begin match eval c with
       | Bool true  -> eval i
       | Bool false -> eval e
-      | _ -> failwith "expected bool!"
+      | _ -> failwith "need bool!"
     end
 ```
 
-_<p class="subtitle">Evaluationsfunktion für `L-ADT-If`</p>_
+_<p class="subtitle">Evaluationsfunktion ohne GADTs</p>_
 
 ---
-
-#### Probleme von `L-ADT-If`
 
 <style scoped> pre { font-size: 0.7rem; }
 </style>
@@ -220,7 +215,7 @@ Exception: Failure "need bool!"
 </div>
 </div>
 
-_<p class="subtitle">Beispiele in `L-ADT-If`</p>_
+_<p class="subtitle">Beispiele ohne GADTs</p>_
 
 - Ungültige Programmdefinition möglich
 - Laufzeitfehler im Interpreter   
@@ -228,7 +223,7 @@ _<p class="subtitle">Beispiele in `L-ADT-If`</p>_
 
 ---
 
-#### In einer Welt mit GADTs: `L-GADT-If`
+#### In einer Welt mit GADTs
 
 #
 
@@ -245,13 +240,13 @@ type _ expr =
   | If   : bool expr * 'a expr * 'a expr -> 'a expr
 ```
 
-_<p class="subtitle">Syntaxbaum für `L-GADT-If`</p>_
+_<p class="subtitle">Syntaxbaum mit GADTs</p>_
 
 # 
 
 ---
 
-#### ADTs vs GADTs
+#### Variants vs GADTs
 
 #
 
@@ -265,7 +260,7 @@ type atom =
   | Bool : bool -> atom
   | Int  : int  -> atom
 ```
-_<p class="subtitle">`L-ADT-If` atom</p>_
+_<p class="subtitle">`atom` ohne GADTs</p>_
 </div>
 <div>
 
@@ -274,14 +269,14 @@ type _ atom =
   | Bool : bool -> bool atom
   | Int  : int  -> int  atom
 ```
-_<p class="subtitle">`L-GADT-If` atom</p>_
+_<p class="subtitle">`atom` mit GADTs</p>_
 </div>
 </div>
 
 
 #
 
-Konstrukturen eines GADTs können _verschiedene_ Typen annehmen, während bei ADTs alle Konstruktoren den _selben_ Typ haben.
+Konstrukturen können _verschiedene_ Typen annehmen.
 
 --- 
 
@@ -295,11 +290,10 @@ let rec eval : .. = function
   | If (c, i, e)  -> if eval c then eval i else eval e
 ```
 
-_<p class="subtitle">Evaluationsfunktion für `L-GADT-If`</p>_
+_<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 
 ---
 
-#### Die Vorteile von `L-GADT-If`
 
 <style scoped> 
   pre {  
@@ -315,18 +309,15 @@ _<p class="subtitle">Evaluationsfunktion für `L-GADT-If`</p>_
   }
 </style>
 <div class="columns">
-<div>
+<div class="error">
 
 ```ocaml
 eval (If 
      (Atom (Bool true),
      (Atom (Int 42)),
-     (Atom (Int 0))))
+     (Atom (Bool false))))
 ```
 
-```ocaml
-- : int = 42
-```
 
 </div>
 <div class="error">
@@ -334,14 +325,24 @@ eval (If
 ```ocaml
 eval (If 
      (Atom (Int 42),
-     (Atom (Bool false)),
-     (Atom (Int 0))))
+     (Atom (Bool true)),
+     (Atom (Bool false))))
 ```
 
 </div>
 </div>
 
-_<p class="subtitle">Beispiele in `L-GADT-If`</p>_
+<div class="error">
+
+```
+Error: This expression has type int atom
+       but an expression was expected of type bool atom
+       Type int is not compatible with type bool
+```
+
+</div>
+
+_<p class="subtitle">Beispiele mit GADTs</p>_
 
 - Keine ungültigen Programmdefinitionen
 - Keine Laufzeitfehler im Interpreter
@@ -371,11 +372,14 @@ let rec eval (type a) (e : a expr) : a = match e with
   | If (c, i, e)  -> if eval c then eval i else eval e
 ```
 
-_<p class="subtitle">Evaluationsfunktion mit Lokal Abstrakten Typen für `L-GADT-If`</p>_
+_<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 
 ---
 
 #### Polymorphe Rekursion
+
+#
+#
 
 <style scoped>  pre { font-size: 0.75rem; }
 </style>
@@ -388,9 +392,14 @@ let rec eval : 'a. 'a expr -> 'a =
       | If (c, i, e)  -> if eval c then eval i else eval e
 ```
 
-_<p class="subtitle">Evaluationsfunktion mit L.A.T. und polymorpher Rekursion für `L-GADT-If`</p>_
+_<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 
 ---
+
+#### Syntactic Sugar
+
+# 
+#
 
 <style scoped>  pre { font-size: 0.85rem; }
 </style>
@@ -403,7 +412,7 @@ let rec eval : type a. a expr -> a = function
   | If (c, i, e)  -> if eval c then eval i else eval e   
 ```
 
-_<p class="subtitle">Evaluationsfunktion für `L-GADT-If`</p>_
+_<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 
 ---
 
@@ -428,7 +437,6 @@ let first : type a r. a list -> (a, r) mode -> r =
       | Unsafe -> failwith "list is empty"
       | Option -> None)
 ```
-_<p class="subtitle">Funktion mit unterschiedlichen Rückgabewerten</p>_
 
 ---
 
@@ -445,23 +453,35 @@ type stringable =
 let print (Stringable s) = 
   print_endline (s.to_string s.item)       
 ```
-_<p class="subtitle">Existenzieller Typ</p>_
+
+---
+
+#### Limitationen
+#
+
+- Typinferenz unentscheidbar
+  $\rightarrow$ Typannotationen notwendig
+
+- `|`-Patterns nicht auflösbar
+  $\rightarrow$ Auflösen und Logik auslagern
+
+- `[@@-deriving ..]` nicht ausdrückbar
+  $\rightarrow$ Non-GADT Version benötigt
 
 ---
 #### In einer Nussschale
+#
 
-<style scoped>  li { font-size: 0.75rem; letter-spacing: 0.00000001rem; }
-</style>
 
-- GADTs sind eine Erweiterung von ADTs, die es erlaubt, dass Variants verschiedene Typen, basierend auf jeweils eigenen Typvariablen, annehmen können
-- Beim Patternmatching extrahiert der Compiler über GADTs mehr Informationen und kann somit mehr Fälle eliminieren
-- Mit GADTs lassen sich einige interessante Konzepte realisieren, wie Existenzielle Typen, Funktionen mit verschiedenen Rückgabewerten und im generellen ausdrucksstärkere Typdefinitionen
-- Allerdings wird mit GADTs die Typinferenz unentscheidbar, weshalb Typannotationen benötigt werden, zudem benötigt es neue Konzepte um rekursive Funktionen zu realisieren
+- GADTs erlaubt Konstrukturen verschiedene Typen anzunehmen
+- Stärkere Aussagen auf Typebene möglich
+- Patternmatching nutzt die zusätzlichen Informationen
+- Typinferenz wird unentscheidbar
 
 ---
-#### Folien
+#### Folien & Code
+- [https://github.com/Mari-W/ocaml-gadts](https://github.com/Mari-W/ocaml-gadts)
 
-[https://mari-w.github.io/ocaml-gadts](https://mari-w.github.io/ocaml-gadts/)
 
 #### Literatur
 - [Real World OCaml: GADTs](https://dev.realworldocaml.org/gadts.html) <br> Yaron Minsky, Anil Madhavapeddy `2021`

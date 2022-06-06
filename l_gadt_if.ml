@@ -15,4 +15,4 @@ let rec _eval : 'a. 'a expr -> 'a =
 let rec eval : type a. a expr -> a = function
   | Atom (Bool b) -> b
   | Atom (Int i)  -> i
-  | If (c, i, e)  -> if eval c then eval i else eval e
+  | If (c, i, e)  -> if eval c then eval i else eval e;;
