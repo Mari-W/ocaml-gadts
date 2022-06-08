@@ -61,7 +61,11 @@ style: |
 ---
 
 <!--
-- CFG
+- Grammatik
+- Atoms kleinste Einheit
+- Bools & Ints
+- Ifs
+
 -->
 
 #### Sprachdefinition
@@ -71,7 +75,7 @@ style: |
 
 $$
 \begin{align*}
-Atom &::= \text{true} \text{ } | \text{ } \text{false}  \text{ } | \text{ } 0..9^+ \\
+Atom &::= \text{true} \text{ } | \text{ } \text{false}  \text{ } | \text{ } -^?0..9^+ \\
 Expr &::= Atom \text{ } | \textbf{ if } Expr \textbf{ then } Expr \textbf{ else } Expr
 \end{align*}
 $$
@@ -149,6 +153,10 @@ else
 
 ---
 
+<!--
+- 
+-->
+
 #### In einer Welt ohne GADTs
 
 # 
@@ -159,7 +167,7 @@ else
 ```ocaml
 type atom =
   | Bool of bool
-  | Nat  of int
+  | Int  of int
 
 type expr =
   | Atom of atom
@@ -192,21 +200,21 @@ _<p class="subtitle">Evaluationsfunktion ohne GADTs</p>_
 ```ocaml
 eval (If 
      (Atom (Bool true),
-     (Atom (Nat 42)),
-     (Atom (Nat 0))))
+     (Atom (Int 42)),
+     (Atom (Int 0))))
 ```
 
 ```ocaml
-- : atom = Atom (Nat 42)
+- : atom = Atom (Int 42)
 ```
 
 </div><div>
 
 ```ocaml
 eval (If 
-     (Atom (Nat 42),
+     (Atom (Int 42),
      (Atom (Bool false)),
-     (Atom (Nat 0))))           
+     (Atom (Int 0))))           
 ```
 ```ocaml
 Exception: Failure "need bool!"
@@ -233,7 +241,7 @@ _<p class="subtitle">Beispiele ohne GADTs</p>_
 ```ocaml
 type _ atom =
   | Bool : bool -> bool atom
-  | Nat  : int  -> int  atom
+  | Int  : int  -> int  atom
 
 type _ expr =
   | Atom : 'a atom -> 'a expr
@@ -244,6 +252,7 @@ _<p class="subtitle">Syntaxbaum mit GADTs</p>_
 
 # 
 
+<!--
 ---
 
 #### Variants vs GADTs
@@ -258,7 +267,7 @@ _<p class="subtitle">Syntaxbaum mit GADTs</p>_
 ```ocaml
 type atom =
   | Bool : bool -> atom
-  | Nat  : int  -> atom
+  | Int  : int  -> atom
 ```
 _<p class="subtitle">`atom` ohne GADTs</p>_
 </div>
@@ -267,7 +276,7 @@ _<p class="subtitle">`atom` ohne GADTs</p>_
 ```ocaml
 type _ atom =
   | Bool : bool -> bool atom
-  | Nat  : int  -> int  atom
+  | Int  : int  -> int  atom
 ```
 _<p class="subtitle">`atom` mit GADTs</p>_
 </div>
@@ -277,7 +286,7 @@ _<p class="subtitle">`atom` mit GADTs</p>_
 #
 
 Konstrukturen können _verschiedene_ Typen annehmen.
-
+-->
 --- 
 
 <style scoped>  pre { font-size: 0.85rem; }
@@ -286,7 +295,7 @@ Konstrukturen können _verschiedene_ Typen annehmen.
 ```ocaml
 let rec eval : .. = function
   | Atom (Bool b) -> b
-  | Atom (Nat i)  -> i
+  | Atom (Int i)  -> i
   | If (c, t, e)  -> if eval c then eval t else eval e
 ```
 
@@ -313,8 +322,8 @@ _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 
 ```ocaml
 eval (If 
-     (Atom (Bool true),
-     (Atom (Nat 42)),
+     (Atom (Int 42),
+     (Atom (Bool true)),
      (Atom (Bool false))))
 ```
 
@@ -324,9 +333,9 @@ eval (If
 
 ```ocaml
 eval (If 
-     (Atom (Nat 42),
-     (Atom (Bool true)),
-     (Atom (Bool false))))
+     (Atom (Bool true),
+     (Atom (Bool false)),
+     (Atom (Int 42))))
 ```
 
 </div>
@@ -335,9 +344,7 @@ eval (If
 <div class="error">
 
 ```
-Error: This expression has type int atom
-       but an expression was expected of type bool atom
-       Type int is not compatible with type bool
+Error: Type int is not compatible with type bool
 ```
 
 </div>
@@ -366,15 +373,13 @@ pre {
 ```ocaml
 let rec eval (type a) (e : a expr) : a = match e with
   | Atom (Bool b) -> b
-  | Atom (Nat i)  -> i
+  | Atom (Int i)  -> i
   | If (c, t, e)  -> if eval c then eval t else eval e
 ```
 
 ```
 Error: This expression has type a expr but an
-       expression was expected of type
-         bool expr
-       The type constructor a would escape its scope  
+       expression was expected of type bool expr      
 ```
 
 _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
@@ -393,7 +398,7 @@ _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 let rec eval : 'a. 'a expr -> 'a = 
     fun (type a) (e : a expr) : a -> match e with
       | Atom (Bool b) -> b
-      | Atom (Nat i)  -> i
+      | Atom (Int i)  -> i
       | If (c, t, e)  -> if eval c then eval t else eval e
 ```
 
@@ -413,7 +418,7 @@ _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 ```ocaml
 let rec eval : type a. a expr -> a = function
   | Atom (Bool b) -> b
-  | Atom (Nat i)  -> i
+  | Atom (Int i)  -> i
   | If (c, t, e)  -> if eval c then eval t else eval e   
 ```
 
