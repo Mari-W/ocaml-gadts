@@ -87,7 +87,7 @@ $$
     font-size: 0.8rem;
   }
   div.error > pre {
-    font-size: 0.77rem;
+    font-size: 0.777rem;
     border: 0.05rem;
     background-color: rgb(242, 241, 244); 
     border-color: #B00020;
@@ -251,42 +251,6 @@ type _ expr =
 _<p class="subtitle">Syntaxbaum mit GADTs</p>_
 
 # 
-
-<!--
----
-
-#### Variants vs GADTs
-
-#
-
-<style scoped> pre { font-size: 0.7rem; } 
-</style>
-<div class="columns">
-<div>
-
-```ocaml
-type atom =
-  | Bool : bool -> atom
-  | Int  : int  -> atom
-```
-_<p class="subtitle">`atom` ohne GADTs</p>_
-</div>
-<div>
-
-```ocaml
-type _ atom =
-  | Bool : bool -> bool atom
-  | Int  : int  -> int  atom
-```
-_<p class="subtitle">`atom` mit GADTs</p>_
-</div>
-</div>
-
-
-#
-
-Konstrukturen können _verschiedene_ Typen annehmen.
--->
 --- 
 
 <style scoped>  pre { font-size: 0.85rem; }
@@ -426,6 +390,22 @@ _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 
 ---
 
+#### Existential Types
+
+```ocaml
+type stringable =                          
+  Stringable : { 
+    item: 'a; 
+    to_string: 'a -> string 
+  } -> stringable
+```
+```ocaml
+let print (Stringable s) = 
+  print_endline (s.to_string s.item)       
+```
+
+---
+
 #### Unterschiedliche Rückgabewerte
 
 <style scoped>  pre { font-size: 0.75rem;  }
@@ -450,22 +430,6 @@ let first : type a r. a list -> (a, r) mode -> r =
 
 ---
 
-#### Existential Types
-
-```ocaml
-type stringable =                          
-  Stringable : { 
-    item: 'a; 
-    to_string: 'a -> string 
-  } -> stringable
-```
-```ocaml
-let print (Stringable s) = 
-  print_endline (s.to_string s.item)       
-```
-
----
-
 #### Limitationen
 #
 
@@ -483,14 +447,15 @@ let print (Stringable s) =
 #
 
 
-- GADTs erlaubt Konstrukturen verschiedene Typen anzunehmen
+- GADTs erlaubt Konstrukturen verschiedene Typenparamter einzusetzen
 - Stärkere Aussagen auf Typebene möglich
 - Patternmatching nutzt die zusätzlichen Informationen
+- Generalisierung von Existentials
 - Typinferenz wird unentscheidbar
 
 ---
 #### Folien & Code
-- [https://github.com/Mari-W/ocaml-gadts](https://github.com/Mari-W/ocaml-gadts)
+[github.com/Mari-W/ocaml-gadts](https://github.com/Mari-W/ocaml-gadts)
 
 
 #### Literatur
@@ -498,3 +463,37 @@ let print (Stringable s) =
 - [Detecting use-cases for GADTs in OCaml](https://blog.mads-hartmann.com/ocaml/2015/01/05/gadt-ocaml.html) Mads Hartmann   `2015`
 - [Stanford CS242: Programming Languages](https://stanford-cs242.github.io/assets/slides/04.2-polymorphism-existential.pdf)
 Will Crichton `2019`
+
+---
+
+#### Variants vs GADTs
+
+#
+
+<style scoped> pre { font-size: 0.7rem; } 
+</style>
+<div class="columns">
+<div>
+
+```ocaml
+type atom =
+  | Bool : bool -> atom
+  | Int  : int  -> atom
+```
+_<p class="subtitle">`atom` ohne GADTs</p>_
+</div>
+<div>
+
+```ocaml
+type _ atom =
+  | Bool : bool -> bool atom
+  | Int  : int  -> int  atom
+```
+_<p class="subtitle">`atom` mit GADTs</p>_
+</div>
+</div>
+
+
+#
+
+Konstrukturen können _verschiedene_ Typenparameter einsetzen.
