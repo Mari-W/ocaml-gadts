@@ -225,9 +225,9 @@ Exception: Failure "need bool!"
 
 _<p class="subtitle">Beispiele ohne GADTs</p>_
 
-- Ungültige Programmdefinition möglich
+- Ungültige Programmdefinitionen
 - Laufzeitfehler im Interpreter   
-- Zweige können verschiedene Typen haben
+- Zweige mit verschiedenen Typen
 
 ---
 
@@ -315,7 +315,7 @@ Error: Type int is not compatible with type bool
 
 _<p class="subtitle">Beispiele mit GADTs</p>_
 
-- Keine ungültigen Programmdefinitionen
+- Nur gültige Programmdefinitionen
 - Keine Laufzeitfehler im Interpreter
 - Exhaustive Patternmatching
 
@@ -464,8 +464,8 @@ let first : type a r. a list -> (a, r) mode -> r =
 - [Stanford CS242: Programming Languages](https://stanford-cs242.github.io/assets/slides/04.2-polymorphism-existential.pdf)
 Will Crichton `2019`
 
+<!--
 ---
-
 #### Variants vs GADTs
 
 #
@@ -497,3 +497,4 @@ _<p class="subtitle">`atom` mit GADTs</p>_
 #
 
 Konstrukturen können _verschiedene_ Typparameter einsetzen.
+-->
