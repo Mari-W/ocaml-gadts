@@ -437,9 +437,9 @@ let first : type a r. a list -> (a, r) mode -> r =
    $\rightarrow$ Typannotationen notwendig
 
 - `|`-Patterns nicht auflösbar
-   $\rightarrow$ Auflösen und Logik auslagern
+   $\rightarrow$ Manuell auflösen und Logik auslagern
 
-- `[@@-deriving ..]` nicht ausdrückbar
+- `[@@-deriving ..]`-Annotation nicht möglich
    $\rightarrow$ Non-GADT Version benötigt
 
 ---
@@ -447,7 +447,7 @@ let first : type a r. a list -> (a, r) mode -> r =
 #
 
 
-- GADTs erlaubt Konstrukturen verschiedene Typenparamter einzusetzen
+- GADTs erlauben Konstrukturen verschiedene Typparameter einzusetzen
 - Stärkere Aussagen auf Typebene möglich
 - Patternmatching nutzt die zusätzlichen Informationen
 - Generalisierung von Existentials
@@ -496,4 +496,4 @@ _<p class="subtitle">`atom` mit GADTs</p>_
 
 #
 
-Konstrukturen können _verschiedene_ Typenparameter einsetzen.
+Konstrukturen können _verschiedene_ Typparameter einsetzen.
