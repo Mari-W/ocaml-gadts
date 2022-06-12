@@ -202,7 +202,7 @@ eval (If
 ```
 
 ```ocaml
-- : atom = Int 42
+- : expr = Int 42
 ```
 
 </div><div>
