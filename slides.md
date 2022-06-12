@@ -211,7 +211,7 @@ eval (If
 eval (If 
      (Int 42,
      (Bool false),
-     (Int 0)))           
+     (Int 0)))                  
 ```
 ```ocaml
 Exception: Failure "need bool!"
@@ -237,7 +237,7 @@ _<p class="subtitle">Beispiele ohne GADTs</p>_
 
 ```ocaml
 type _ expr =
-  | Bool : Bool -> bool expr
+  | Bool : bool -> bool expr
   | Int  : int  -> int  expr
   | If   : bool expr * 'a expr * 'a expr -> 'a expr
 ```
