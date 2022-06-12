@@ -75,8 +75,8 @@ style: |
 
 $$
 \begin{align*}
-Atom &::= \text{true} \text{ } | \text{ } \text{false}  \text{ } | \text{ } -^?0..9^+ \\
-Expr &::= Atom \text{ } | \textbf{ if } Expr \textbf{ then } Expr \textbf{ else } Expr
+
+Expr ::=& \text{ } \text{  true} \text{ } \\&| \text{ } \text{false}  \text{ } \\&| \text{ } -^?0..9^+ \\&| \textbf{ if } Expr \textbf{ then } Expr \textbf{ else } Expr
 \end{align*}
 $$
 
@@ -165,12 +165,9 @@ else
 </style>
 
 ```ocaml
-type atom =
+type expr =
   | Bool of bool
   | Int  of int
-
-type expr =
-  | Atom of atom
   | If   of expr * expr * expr
 ```
 
@@ -179,13 +176,13 @@ _<p class="subtitle">Syntaxbaum ohne GADTs</p>_
 ---
 
 ```ocaml
-let rec eval : expr -> atom = function
-  | Atom a -> a
+let rec eval : expr -> expr = function
   | If (c, t, e) -> begin match eval c with
       | Bool true  -> eval t
       | Bool false -> eval e
       | _ -> failwith "need bool!"
     end
+  | e -> e
 ```
 
 _<p class="subtitle">Evaluationsfunktion ohne GADTs</p>_
@@ -199,22 +196,22 @@ _<p class="subtitle">Evaluationsfunktion ohne GADTs</p>_
 
 ```ocaml
 eval (If 
-     (Atom (Bool true),
-     (Atom (Int 42)),
-     (Atom (Int 0))))
+     (Bool true,
+     (Int 42),
+     (Int 0)))
 ```
 
 ```ocaml
-- : atom = Atom (Int 42)
+- : atom = Int 42
 ```
 
 </div><div>
 
 ```ocaml
 eval (If 
-     (Atom (Int 42),
-     (Atom (Bool false)),
-     (Atom (Int 0))))           
+     (Int 42,
+     (Bool false),
+     (Int 0)))           
 ```
 ```ocaml
 Exception: Failure "need bool!"
@@ -239,12 +236,9 @@ _<p class="subtitle">Beispiele ohne GADTs</p>_
 </style>
 
 ```ocaml
-type _ atom =
-  | Bool : bool -> bool atom
-  | Int  : int  -> int  atom
-
 type _ expr =
-  | Atom : 'a atom -> 'a expr
+  | Bool : Bool -> bool expr
+  | Int  : int  -> int  expr
   | If   : bool expr * 'a expr * 'a expr -> 'a expr
 ```
 
@@ -258,8 +252,8 @@ _<p class="subtitle">Syntaxbaum mit GADTs</p>_
 
 ```ocaml
 let rec eval : .. = function
-  | Atom (Bool b) -> b
-  | Atom (Int i)  -> i
+  | Bool b        -> b
+  | Int i         -> i
   | If (c, t, e)  -> if eval c then eval t else eval e
 ```
 
@@ -286,9 +280,9 @@ _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 
 ```ocaml
 eval (If 
-     (Atom (Int 42),
-     (Atom (Bool true)),
-     (Atom (Bool false))))
+     (Int 42,
+     (Bool true),
+     (Bool false)))
 ```
 
 
@@ -297,9 +291,9 @@ eval (If
 
 ```ocaml
 eval (If 
-     (Atom (Bool true),
-     (Atom (Bool false)),
-     (Atom (Int 42))))
+     (Bool true,
+     (Bool false),
+     (Int 42)))
 ```
 
 </div>
@@ -336,8 +330,8 @@ pre {
 
 ```ocaml
 let rec eval (type a) (e : a expr) : a = match e with
-  | Atom (Bool b) -> b
-  | Atom (Int i)  -> i
+  | Bool b -> b
+  | Int i  -> i
   | If (c, t, e)  -> if eval c then eval t else eval e
 ```
 
@@ -361,8 +355,8 @@ _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 ```ocaml
 let rec eval : 'a. 'a expr -> 'a = 
     fun (type a) (e : a expr) : a -> match e with
-      | Atom (Bool b) -> b
-      | Atom (Int i)  -> i
+      | Bool b -> b
+      | Int i  -> i
       | If (c, t, e)  -> if eval c then eval t else eval e
 ```
 
@@ -381,8 +375,8 @@ _<p class="subtitle">Evaluationsfunktion mit GADTs</p>_
 
 ```ocaml
 let rec eval : type a. a expr -> a = function
-  | Atom (Bool b) -> b
-  | Atom (Int i)  -> i
+  | Bool b -> b
+  | Int i  -> i
   | If (c, t, e)  -> if eval c then eval t else eval e   
 ```
 
