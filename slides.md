@@ -436,14 +436,14 @@ let first : type a r. a list -> (a, r) mode -> r =
    $\rightarrow$ Non-GADT Version benötigt
 
 ---
-#### In einer Nussschale
+#### Zusammengefasst
 #
 
 
 - GADTs erlauben Konstrukturen verschiedene Typparameter einzusetzen
 - Stärkere Aussagen auf Typebene möglich
 - Patternmatching nutzt die zusätzlichen Informationen
-- Generalisierung von Existentials
+- GATDs erlauben existenziell quantifizierte Typen zu formen
 - Typinferenz wird unentscheidbar
 
 ---
@@ -456,38 +456,3 @@ let first : type a r. a list -> (a, r) mode -> r =
 - [Detecting use-cases for GADTs in OCaml](https://blog.mads-hartmann.com/ocaml/2015/01/05/gadt-ocaml.html) Mads Hartmann   `2015`
 - [Stanford CS242: Programming Languages](https://stanford-cs242.github.io/assets/slides/04.2-polymorphism-existential.pdf)
 Will Crichton `2019`
-
-<!--
----
-#### Variants vs GADTs
-
-#
-
-<style scoped> pre { font-size: 0.7rem; } 
-</style>
-<div class="columns">
-<div>
-
-```ocaml
-type atom =
-  | Bool : bool -> atom
-  | Int  : int  -> atom
-```
-_<p class="subtitle">`atom` ohne GADTs</p>_
-</div>
-<div>
-
-```ocaml
-type _ atom =
-  | Bool : bool -> bool atom
-  | Int  : int  -> int  atom
-```
-_<p class="subtitle">`atom` mit GADTs</p>_
-</div>
-</div>
-
-
-#
-
-Konstrukturen können _verschiedene_ Typparameter einsetzen.
--->
