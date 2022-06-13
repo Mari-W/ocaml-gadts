@@ -400,8 +400,7 @@ let print (Stringable s) =
 
 ---
 
-#### Unterschiedliche Rückgabewerte
-
+#### Vertiefendes Beispiel 
 <style scoped>  pre { font-size: 0.75rem;  }
 </style>
 
