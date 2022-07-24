@@ -13,17 +13,16 @@ and _ typ =
 
 (* represents some expression in our language *)
 (* the first gadt parameter is used to represent the correspondig type in our language *)
-(* the second gadt parameter is used to differentiate between expressions which are also a value and non-value expressions *)
 and _ exp =
   | Const : 'a -> 'a exp
-  | Abs   : 'a typ * ('a exp -> 'b exp)  -> ('a -> 'b) exp    (* lambda abstraction  *)
+  | Abs   : ('a exp -> 'b exp)  -> ('a -> 'b) exp    (* lambda abstraction  *)
   | App   : ('a -> 'b) exp * 'a exp      -> 'b exp            (* function application *)
   | TAbs  : ('a typ -> 'b exp)           -> ('a, 'b) poly exp (* type level abstraction *)
   | TApp  : ('a, 'b) poly exp * 'a typ   -> 'b exp            (* type level function application *)
 
 let rec eval : type a. a exp -> a = function
   | Const  a        -> a
-  | Abs    (t, ab)  -> fun x -> eval (ab (Const x))
+  | Abs    ab       -> fun x -> eval (ab (Const x))
   | TAbs   ab       -> fun x -> eval (ab TBase)
   | App    (ab, a)  -> eval ab (eval a)
   | TApp   (ab, a)  -> (eval ab) a
@@ -36,7 +35,7 @@ let fls = Const false                         (* false *)
 let boolean : bool typ = TBase                (* bool type *)
 let num (a:int) = Const a                     (* naturals *)
 let nat: int typ = TBase                      (* nat type *)
-let ( @: ) t f = Abs (t, f)                   (* lambda abstraction *)
+let lambda f = Abs f                   (* lambda abstraction *)
 let ( => ) a b : ('a -> 'b) typ = TFun (a, b) (* function type *)
 let ( @ ) a b = App (a, b)                    (* application *)
 let forall f = TAbs f                         (* type level abstraction *)
@@ -44,8 +43,8 @@ let all f = TAll f                            (* forall type *)
 let ( @@ ) a b = TApp (a(), b)                (* type level application  *)
 
 (* examples *) 
-let poly_id () = forall (fun t -> t @: fun x -> x)
+let poly_id () = forall (fun t -> lambda (fun x -> x))
 let app = (poly_id @@ nat) @ num 4
-let app2 = ((poly_id @@ (boolean => boolean)) @ (boolean @: fun x -> x)) @ tru
+let app2 = (poly_id @@ (boolean => boolean)) @ lambda (fun x -> x) @ tru
 let program = app
 let main = eval program
