@@ -5,17 +5,17 @@
 (* the gadt parameter is used to represent the correspondig ocaml type *)
 type _ typ = 
   | TBase  :                        'a typ    
-  | TFun   : 'a typ * 'b typ     -> ('a -> 'b) typ  (* function type *)
-  | TAll   : ('a typ -> 'b typ)  -> ('a -> 'b) typ  (* forall quantifier *)
+  | TFun   : 'a typ * 'b typ     -> ('a -> 'b) typ          (* function type *)
+  | TAll   : ('a typ -> 'b typ)  -> ('a typ -> 'b typ) typ  (* forall quantifier *)
 
 (* represents some expression in our language *)
 (* the gadt parameter is used to represent the correspondig type in our language *)
 and _ exp =
   | Const : 'a -> 'a exp
-  | Abs   : 'a typ * ('a exp -> 'b exp) -> ('a -> 'b) exp     (* lambda abstraction  *)
-  | App   : ('a -> 'b) exp * 'a exp     -> 'b exp             (* function application *)
-  | TAbs  : ('a typ -> 'b exp)          -> ('a typ -> 'b) exp (* type level abstraction *)
-  | TApp  : ('a typ -> 'b) exp * 'a typ -> 'b exp             (* type level function application *)
+  | Abs   : 'a typ * ('a exp -> 'b exp) -> ('a -> 'b) exp       (* lambda abstraction  *)
+  | App   : ('a -> 'b) exp * 'a exp     -> 'b exp               (* function application *)
+  | TAbs  : ('a typ -> 'b exp)          -> ('a typ -> 'b) exp   (* type level abstraction *)
+  | TApp  : ('a typ -> 'b) exp * 'a typ -> 'b exp               (* type level function application *)
 
 let rec eval : type a. a exp -> a = function
   | Const  a        -> a
