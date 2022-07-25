@@ -23,15 +23,15 @@ let rec eval : type a. a exp -> a = function
 
 
 let u = Const ()                              (* unit *)
-let tunit: unit typ = TBase                   (* unit type *)           
+let tunit: unit typ = TBase                   (* unit type *)
 let tru = Const true                          (* true *)
 let fls = Const false                         (* false *)
 let tbool : bool typ = TBase                  (* bool type *)
-let nat (a: int) = Const a                     (* naturals *)
+let nat (a: int) = Const a                    (* naturals *)
 let tnat: int typ = TBase                     (* nat type *)
 let pair a b = Const (a, b)                   (* pair *)
 let tpair = (TBase, TBase)                    (* pair type *)
-let lst (a: 'a list) = Const a                 (* list *)
+let lst (a: 'a list) = Const a                (* list *)
 let tlst: 'a list typ = TBase                 (* list type *)
 let ( := ) t f = Abs (t, f)                   (* lambda abstraction *)
 let ( => ) a b : ('a -> 'b) typ = TFun (a, b) (* function type *)
