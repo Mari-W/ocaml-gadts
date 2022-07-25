@@ -1,0 +1,179 @@
+{-# LANGUAGE
+    GADTs
+  , KindSignatures
+  , FlexibleInstances
+  , EmptyDataDecls
+  #-}
+
+module SystemF (
+  -- * Error handling
+    ErrOr
+  , good
+  , err
+  , isGood
+  , get
+  
+  -- * Syntax types
+  , Type (NumTy, FunTy, VTy)
+  , Term
+  , V
+  
+  -- * Primitives
+  , num
+  , succ
+  , v
+  , l
+  , app
+  , tapp
+  
+  -- * Library
+  , id'
+  , const'
+  , succ'
+  ) where
+
+import Prelude hiding (succ)
+import Control.Applicative
+import Control.Monad
+
+
+------------------------ prelimiary ---------------------------------
+
+type ErrOr a = Either String a
+
+good :: a -> ErrOr a
+good = Right
+
+err :: String-> ErrOr a
+err = Left
+
+isGood :: ErrOr a -> Bool
+isGood Right{} = True
+isGood Left{}  = False
+
+get :: ErrOr a -> a
+get (Right x) = x
+get (Left e)  = error e
+
+-------------------- data types -------------------------------------
+
+data Primitive :: * -> * where
+  Num :: Integer -> Primitive Integer
+  Succ :: Primitive (Integer -> Integer)
+
+---------------------------------------------------------------------
+
+data Type :: * -> * where
+  NumTy :: Type Integer
+  FunTy :: Type a -> Type b -> Type (a -> b)
+  VTy :: (Type a -> Type b) -> Type (V a b)
+  TyVar :: Char -> Type a
+
+instance Eq (Type a) where
+  (==) = eqTy (['A' .. 'Z'] ++ ['a' .. 'z'])
+
+eqTy :: [Char] -> Type a -> Type a -> Bool
+eqTy _ NumTy NumTy = True
+eqTy cs (FunTy dom rng) (FunTy dom' rng') = eqTy cs dom dom' && eqTy cs rng rng'
+eqTy (c:cs) (VTy f) (VTy f') = eqTy cs (f (TyVar c)) (f' (TyVar c))
+eqTy [] _ _ = error "Contratulations, you've used up all of the characters. Impressive."
+eqTy _ (TyVar c) (TyVar c') = c == c'
+eqTy _ _ _ = False
+
+instance Show (Type a) where
+  show = showTy ("XYZ" ++ ['A' .. 'W'])
+
+showTy :: [Char] -> (Type a) -> String
+showTy _ NumTy = "Num"
+showTy cs (FunTy dom rng) = "(" ++ showTy cs dom ++ " -> " ++ showTy cs rng ++ ")"
+showTy (c:cs) (VTy f) = "(Forall " ++ [c] ++ ". " ++ showTy cs (f (TyVar c)) ++ ")"
+showTy [] VTy{} = error "Too many nested type applications"
+showTy _ (TyVar t) = [t]
+
+---------------------------------------------------------------------
+
+data V a b
+
+---------------------------------------------------------------------
+
+data Term :: * -> * where
+  Prim :: Primitive a -> Term a
+  Abs :: Type a -> (Term a -> Term b) -> Term (a -> b)
+  App :: Term (a -> b) -> Term a -> Term b
+  TAbs :: (Type a -> Term b) -> Term (V a b)
+  TApp :: Term (V a b) -> Type a -> Term b
+  Unknown :: Char -> Term a
+
+
+instance Eq (Term Integer) where
+  (==) = undefined
+
+instance Num (Term Integer) where
+  fromInteger = num
+  (+) = undefined
+  (-) = undefined
+  (*) = undefined
+  abs = undefined
+  signum = undefined
+  negate = undefined
+
+-------------------------- evaluation -------------------------------
+
+eval' :: Term a -> ErrOr (Term a)
+eval' (Prim p)   = good $ Prim p
+eval' (Abs t f)  = good $ Abs t f
+eval' (TAbs f)   = good $ TAbs f
+eval' (App f x)  = do
+  f' <- eval' f
+  res <- runApp f' <*> eval' x
+  eval' res
+eval' (TApp f x) = do
+  f' <- eval' f
+  res <- runTApp f' <*> pure x
+  eval' res
+
+eval :: Term a -> ErrOr a
+eval t = eval' t >>= valueOf
+
+---------------------------------------------------------------------
+
+valueOf :: Term a -> ErrOr a
+valueOf (Prim n) = fromPrim n
+valueOf _ = err "Not a value"
+
+fromPrim :: Primitive a -> ErrOr a
+fromPrim (Num n) = good n
+fromPrim _ = err "fromPrim failed unexpectedly"
+
+---------------------------------------------------------------------
+
+runApp :: Term (a -> b) -> ErrOr (Term a -> Term b)
+runApp (Abs t f) = good f
+runApp (Prim p) = runAppPrim p
+runApp _ = err "unexpected non-abstraction used in application"
+
+runAppPrim :: Primitive (a -> b) -> ErrOr (Term a -> Term b)
+runAppPrim Succ = good $ \(Prim (Num n)) -> num (n + 1)
+
+---------------------------------------------------------------------
+
+runTApp :: Term (V a b) -> ErrOr (Type a -> Term b)
+runTApp (TAbs f) = good f
+runTApp _ = err "runTApp failed unexpectedly"
+
+----------------- language primitives -------------------------------
+
+num = Prim . Num
+succ = Prim Succ
+
+v = TAbs
+l = Abs
+
+app = App
+tapp = TApp
+
+-------------------- basic library functions-------------------------
+
+id' = v (\t -> l t (\x -> x))
+const' = v (\t1 -> v (\t2 -> l t1 (\x -> l t2 (\_ -> x))))
+succ' = l NumTy (\x -> app succ x)
