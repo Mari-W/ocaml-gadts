@@ -40,9 +40,7 @@ let forall f = TAbs f                         (* type level abstraction *)
 let all f = TAll f                            (* forall type *)
 
 (* note: to bypass the OCaml's value restriction all TAbs must be wrapped with an unit lambda function! *)
-let ( @@ ) a b = TApp (a(), b)                (* type level application  *) 
-let wrap a () = a                             (* explicit wrapping  *) 
-let ( @: ) a b = wrap (a @@ b)                (* auto wrapping when using non-toplevel foralls  *) 
+let ( @@ ) a b = TApp (a(), b)                (* type level application *)
 
 
 (* examples *) 
@@ -51,7 +49,7 @@ let app = (poly_id @@ tnat) @ nat 4
 let app_2 = ((poly_id @@ (tbool => tbool)) @ (tbool := (fun x -> x))) @ tru
 let two_insts () = all (fun x -> x) := (fun x -> pair (fun x -> x @@ tnat) (fun x -> x @@ tbool))
 let poly_id_2 () = forall (fun t -> forall (fun t2 -> t := fun x -> t2 := fun y -> pair x y))
-let app_3 = (((poly_id_2 @: tnat) @@ tnat) @ nat 0) @ nat 42
+let app_3 = (((fun _ -> (poly_id_2 @@ tnat)) @@ tnat) @ nat 0) @ nat 42
 
 (* todo: prevent double eval in a generic way for all custom constants *)
 let (a, b) = eval app_3
