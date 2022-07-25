@@ -41,7 +41,6 @@ let forall f = TAbs f                         (* type level abstraction *)
 let all f = TAll f                            (* forall type *)
 let ( @@ ) a b = TApp (a(), b)                (* type level application  *)
 let ( @: ) a b = fun a -> a @@ b              (* type level application variables of all types *)
-let id a = a 
 
 (* examples *) 
 let poly_id () = forall (fun t -> t := (fun x -> x))
