@@ -2,9 +2,9 @@
 (* system f interpreter using generialized algebraic data types (GADT) 
                               and higher order abstract syntax  (HOAS) *)
 type _ typ = 
-  | TBase  :                        'a typ                (* base types *)
-  | TFun   : 'a typ * 'b typ    -> ('a -> 'b) typ         (* function type *)
-  | TAll   : ('a typ -> 'b typ) -> ('a typ -> 'b) typ     (* forall quantifier *)
+  | TBase  :                        'a typ            (* base types *)
+  | TFun   : 'a typ * 'b typ    -> ('a -> 'b) typ     (* function type *)
+  | TAll   : ('a typ -> 'b typ) -> ('a typ -> 'b) typ (* forall quantifier *)
 
 and _ exp =
   | Const : 'a                          -> 'a exp             (* constants *)
@@ -28,17 +28,17 @@ let tbool : bool typ = TBase                  (* bool type *)
 let nat (a: int) = Const a                    (* naturals *)
 let tnat: int typ = TBase                     (* nat type *)
 let ( := ) t f = Abs (t, f)                   (* lambda abstraction *)
-let ( => ) a b : ('a -> 'b) typ = TFun (a, b) (* function type *)
+let ( => ) a b : ('a -> 'b) typ = TFun (a, b) (* function type *)              
 let ( @ ) a b = App (a, b)                    (* application *)
 let forall f = TAbs f                         (* type level abstraction *)
-let all f = TAll f                            (* forall type *)
-(* note: to bypass the OCaml's value restriction all TAbs 
+let tall f = TAll f                           (* forall type *)
+(* note: to bypass the OCaml's value restriction all Abs & TAbs 
    must be wrapped with an unit closure,
    this would not be necessary in haskell *)
 let ( @@ ) a b = TApp (a(), b)                (* type level application *)
 
 (* church numerals *) 
-let bool_ () = all (fun alpha -> (alpha => (alpha => alpha)))
+let bool_ () = tall (fun alpha -> (alpha => (alpha => alpha)))
 let true_ () = forall (fun alpha -> alpha := (fun x -> alpha := (fun y -> x)))
 let false_ () = forall (fun alpha -> alpha := (fun x -> alpha := (fun y -> y)))
 let and_ () = bool_() := (fun x -> bool_() := (fun y -> (((fun _ -> x) @@ bool_()) @ y) @ false_())) 
@@ -48,4 +48,4 @@ let if_then_else_ () = forall (fun alpha -> bool_() := fun x -> alpha := fun y -
 
 (* other *)
 let id_ () = forall (fun alpha -> alpha := (fun x -> x))
-let app = (id_ @@ tnat) @ nat 42
+let app_int_id_: int = eval ((id_ @@ tnat) @ nat 42)
