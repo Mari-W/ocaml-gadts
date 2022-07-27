@@ -59,3 +59,5 @@ let build_nat_id_ () = tpoly_id_() := fun f -> f @@ tnat
 let build_bool_id_ () = tpoly_id_() := fun f -> f @@ tbool
 let nat_id_ () = build_nat_id_() @ poly_id_()
 let bool_id_ () = build_bool_id_() @ poly_id_()
+let app_int_id_: int = eval (nat_id_() @ nat 42)
+let app_bool_id_: bool = eval (bool_id_() @ tru)
